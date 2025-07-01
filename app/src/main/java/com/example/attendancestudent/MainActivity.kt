@@ -8,6 +8,7 @@ import com.example.attendancestudent.data.local.AttendanceDatabase
 import com.example.attendancestudent.data.local.MIGRATION_1_2
 import com.example.attendancestudent.data.local.MIGRATION_2_3
 import com.example.attendancestudent.data.local.MIGRATION_3_4
+import com.example.attendancestudent.data.local.MIGRATION_4_5
 import com.example.attendancestudent.data.repository.StudentRepositoryImpl
 import com.example.attendancestudent.domain.usecase.student.DeleteStudentUseCase
 import com.example.attendancestudent.domain.usecase.student.get.GetAllPricesUseCase
@@ -36,7 +37,7 @@ class MainActivity : ComponentActivity() {
             applicationContext,
             AttendanceDatabase::class.java,
             "attendance_db"
-        ).addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4) // ✅ هنا بتستخدم الـ migration
+        ).addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5) // ✅ هنا بتستخدم الـ migration
         .build()
 
         val repo = StudentRepositoryImpl(db.studentDao(),db.yearPriceDao())
