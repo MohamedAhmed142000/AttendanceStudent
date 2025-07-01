@@ -8,8 +8,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 class StudentViewModel(
     private val useCases: StudentUseCases
@@ -18,8 +16,8 @@ class StudentViewModel(
     private val _students = MutableStateFlow<List<Student>>(emptyList())
     val students: StateFlow<List<Student>> = _students.asStateFlow()
 
-    private val _yearPrices = MutableStateFlow<Map<String, Int>>(emptyMap())
-    val yearPrices = _yearPrices.asStateFlow()
+    private val _yearPrices = MutableStateFlow<Map<Pair<String, String>, Int>>(emptyMap())
+    val yearPrices: StateFlow<Map<Pair<String, String>, Int>> = _yearPrices
 
     private val _attendanceResult = MutableStateFlow<Boolean?>(null)
     val attendanceResult: StateFlow<Boolean?> = _attendanceResult
@@ -33,7 +31,7 @@ class StudentViewModel(
     init {
         viewModelScope.launch {
             useCases.getAllPrices().collect { list ->
-                _yearPrices.value = list.associate { it.year to it.pricePerSession }
+                _yearPrices.value = list.associate { Pair(it.year, it.subject) to it.pricePerSession }
             }
         }
         getAllStudents()
@@ -56,9 +54,9 @@ class StudentViewModel(
     }
 
 
-    fun updateYearPrice(year: String, price: Int) {
+    fun updateYearPrice(year: String,subject:String, price: Int) {
         viewModelScope.launch {
-            useCases.updatePrice(year, price)
+            useCases.updatePrice(year,subject, price)
         }
     }
 
@@ -71,9 +69,11 @@ class StudentViewModel(
     }
 
     fun calculateCost(student: Student): Int {
-        val price = yearPrices.value[student.academicYear] ?: 0
+        val key = Pair(student.academicYear, student.subject)
+        val price = yearPrices.value[key] ?: 0
         return student.attendedSessions * price
     }
+
 
 
     fun resetSessions(studentId: Int) {
@@ -115,6 +115,7 @@ class StudentViewModel(
             }
         }
     }
+
 
     fun deleteStudent(student: Student) {
         viewModelScope.launch {

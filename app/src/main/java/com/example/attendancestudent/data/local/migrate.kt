@@ -35,4 +35,17 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             """.trimIndent()
         )
     }
+    val MIGRATION_4_5= object : Migration(4, 5) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("""
+            CREATE TABLE IF NOT EXISTS `year_prices` (
+                `year` TEXT NOT NULL,
+                `subject` TEXT NOT NULL,
+                `pricePerSession` INTEGER NOT NULL,
+                PRIMARY KEY(`year`, `subject`)
+            )
+        """.trimIndent())
+        }
+    }
+
 }

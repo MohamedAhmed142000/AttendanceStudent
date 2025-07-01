@@ -17,4 +17,8 @@ interface YearPriceDao {
 
     @Query("SELECT pricePerSession FROM year_prices WHERE year = :year LIMIT 1")
     suspend fun getPriceForYear(year: String): Int?
+
+    @Query("SELECT * FROM year_prices WHERE year = :year AND subject = :subject")
+    suspend fun getPriceForYearAndSubject(year: String, subject: String): YearPriceEntity?
+
 }

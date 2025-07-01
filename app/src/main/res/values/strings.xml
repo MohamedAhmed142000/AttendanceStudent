@@ -1,3 +1,15 @@
 <resources>
     <string name="app_name">حضور الطلاب</string>
+    <string name="First_grade">الصف الأول الابتدائي</string>
+    <string name="Second_grade">الصف الثاني الابتدائي</string>
+    <string name="Third_grade">الصف الثالث الابتدائي</string>
+    <string name="Fourth_grade">الصف الرابع الابتدائي</string>
+    <string name="Fifth_grade">الصف الخامس الابتدائي</string>
+    <string name="Sixth_grade">الصف السادس الابتدائي</string>
+    <string name="First_year_of_middle_school">الصف الأول الإعدادي</string>
+    <string name="Second_year_of_middle_school">الصف الثاني الإعدادي</string>
+    <string name="Thrid_year_of_middle_school">الصف الثالث الإعدادي</string>
+    <string name="First_year_of_high_school">الصف الأول الثانوي</string>
+    <string name="Second_year_of_high_school">الصف الثاني الثانوي</string>
+    <string name="Thrid_year_of_high_school">الصف الثالث الثانوي</string>
 </resources>

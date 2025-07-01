@@ -10,9 +10,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
@@ -25,15 +22,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.attendancestudent.R
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddStudentDialog(
     onDismiss: () -> Unit,
-    onAdd: (name: String, year: String, subject: String,price: Int?) -> Unit,
-    existingPrices: Map<String, Int>
+    onAdd: (name: String, year: String, subject: String, price: Int?) -> Unit,
+    existingPrices: Map<Pair<String, String>, Int>
 ) {
     var name by remember { mutableStateOf("") }
     var selectedYear by remember { mutableStateOf("") }
@@ -44,20 +42,19 @@ fun AddStudentDialog(
     var selectedSubject by remember { mutableStateOf("") }
 
     val years = listOf(
-        "الصف الأول الابتدائي",
-        "الصف الثاني الابتدائي",
-        "الصف الثالث الابتدائي",
-        "الصف الرابع الابتدائي",
-        "الصف الخامس الابتدائي",
-        "الصف السادس الابتدائي",
-        "الصف الأول الإعدادي",
-        "الصف الثاني الإعدادي",
-        "الصف الثالث الإعدادي",
-        "الصف الأول الثانوي",
-        "الصف الثاني الثانوي",
-        "الصف الثالث الثانوي",
-
-        )
+        stringResource(R.string.First_grade),
+        stringResource(R.string.Second_grade),
+        stringResource(R.string.Third_grade),
+        stringResource(R.string.Fourth_grade),
+        stringResource(R.string.Fifth_grade),
+        stringResource(R.string.Sixth_grade),
+        stringResource(R.string.First_year_of_middle_school),
+        stringResource(R.string.Second_year_of_middle_school),
+        stringResource(R.string.Thrid_year_of_middle_school),
+        stringResource(R.string.First_year_of_high_school),
+        stringResource(R.string.Second_year_of_high_school),
+        stringResource(R.string.Thrid_year_of_high_school)
+    )
     val subjects = listOf(
         "فيزياء",
         "كيمياء",
@@ -70,117 +67,103 @@ fun AddStudentDialog(
         "علوم",
         "انجليزي",
         "دراسات اجتماعيه",
-        )
+    )
+//todo implement add student
+    AlertDialog(onDismissRequest = onDismiss, title = { Text("إضافة طالب جديد") }, text = {
+        Column {
+            OutlinedTextField(
+                value = name, onValueChange = {
+                name = it
+                showError = false
+            }, label = { Text("اسم الطالب") }, modifier = Modifier.fillMaxWidth()
+            )
 
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("إضافة طالب جديد") },
-        text = {
-            Column {
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Dropdown لاختيار السنة الدراسية
+            var expandedyear by remember { mutableStateOf(false) }
+
+
+
+            OutlinedTextField(
+                value = selectedYear,
+                onValueChange = {},
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                label = { Text("السنة الدراسية") },
+                trailingIcon = {
+                    IconButton(onClick = { expandedyear = true }) {
+                        Icon(Icons.Default.ArrowDropDown, contentDescription = "اختر السنة")
+                    }
+                })
+
+            DropdownMenu(expanded = expandedyear, onDismissRequest = { expandedyear = false }) {
+                years.forEach { year ->
+                    DropdownMenuItem(text = { Text(year) }, onClick = {
+                        selectedYear = year
+                        expandedyear = false
+                        showPriceField = !existingPrices.containsKey(Pair(year , selectedSubject))
+
+                    })
+                }
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            var expandedsubject by remember { mutableStateOf(false) }
+            OutlinedTextField(
+                value = selectedSubject,
+                onValueChange = {},
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                label = { Text("المادة") },
+                trailingIcon = {
+                    IconButton(onClick = { expandedsubject = true }) {
+                        Icon(Icons.Default.ArrowDropDown, contentDescription = "اختر المادة")
+                    }
+                })
+
+            DropdownMenu(
+                expanded = expandedsubject, onDismissRequest = { expandedsubject = false }) {
+                subjects.forEach { subject ->
+                    DropdownMenuItem(text = { Text(subject) }, onClick = {
+                        selectedSubject = subject
+                        expandedsubject = false
+                        showPriceField = !existingPrices.containsKey(Pair(selectedYear, subject))
+                    })
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // حقل السعر يظهر فقط لو السنة غير موجودة
+            if (showPriceField) {
                 OutlinedTextField(
-                    value = name,
-                    onValueChange = {
-                        name = it
-                        showError = false
-                    },
-                    label = { Text("اسم الطالب") },
+                    value = price,
+                    onValueChange = { price = it },
+                    label = { Text("سعر الحصة (لو أول مرة)") },
                     modifier = Modifier.fillMaxWidth()
                 )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Dropdown لاختيار السنة الدراسية
-                var expandedyear by remember { mutableStateOf(false) }
-                var expandedsubject by remember { mutableStateOf(false) }
-
-
-                OutlinedTextField(
-                    value = selectedYear,
-                    onValueChange = {},
-                    modifier = Modifier.fillMaxWidth(),
-                    readOnly = true,
-                    label = { Text("السنة الدراسية") },
-                    trailingIcon = {
-                        IconButton(onClick = { expandedyear = true }) {
-                            Icon(Icons.Default.ArrowDropDown, contentDescription = "اختر السنة")
-                        }
-                    }
-                )
-
-                DropdownMenu(expanded = expandedyear, onDismissRequest = { expandedyear = false }) {
-                    years.forEach { year ->
-                        DropdownMenuItem(
-                            text = { Text(year) },
-                            onClick = {
-                                selectedYear = year
-                                expandedyear = false
-                                showPriceField = !existingPrices.containsKey(year)
-
-                            }
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(12.dp))
-
-                OutlinedTextField(
-                    value = selectedSubject,
-                    onValueChange = {},
-                    modifier = Modifier.fillMaxWidth(),
-                    readOnly = true,
-                    label = { Text("المادة") },
-                    trailingIcon = {
-                        IconButton(onClick = { expandedsubject = true }) {
-                            Icon(Icons.Default.ArrowDropDown, contentDescription = "اختر المادة")
-                        }
-                    }
-                )
-
-                DropdownMenu(expanded = expandedsubject, onDismissRequest = { expandedsubject = false }) {
-                    subjects.forEach { subject ->
-                        DropdownMenuItem(
-                            text = { Text(subject) },
-                            onClick = {
-                                selectedSubject = subject
-                                expandedsubject = false
-                                
-                            }
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // حقل السعر يظهر فقط لو السنة غير موجودة
-                if (showPriceField) {
-                    OutlinedTextField(
-                        value = price,
-                        onValueChange = { price = it },
-                        label = { Text("سعر الحصة (لو أول مرة)") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-
-                if (showError) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("يرجى تعبئة جميع الحقول المطلوبة", color = Color.Red)
-                }
             }
-        },
-        confirmButton = {
-            Button(onClick = {
-                if (name.isBlank() || selectedYear.isBlank() || (showPriceField && price.isBlank())) {
-                    showError = true
-                } else {
-                    onAdd(name.trim(), selectedYear.trim(), subject.trim(),price.toIntOrNull())
-                }
-            }) {
-                Text("إضافة")
-            }
-        },
-        dismissButton = {
-            OutlinedButton(onClick = onDismiss) {
-                Text("إلغاء")
+
+            if (showError) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text("يرجى تعبئة جميع الحقول المطلوبة", color = Color.Red)
             }
         }
-    )
+    }, confirmButton = {
+        Button(onClick = {
+            if (name.isBlank() || selectedYear.isBlank() || (showPriceField && price.isBlank())) {
+                showError = true
+            } else {
+                onAdd(
+                    name.trim(), selectedYear.trim(), selectedSubject.trim(), price.toIntOrNull()
+                )
+            }
+        }) {
+            Text("إضافة")
+        }
+    }, dismissButton = {
+        OutlinedButton(onClick = onDismiss) {
+            Text("إلغاء")
+        }
+    })
 }

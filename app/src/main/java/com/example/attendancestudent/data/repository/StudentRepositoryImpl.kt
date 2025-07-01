@@ -41,8 +41,8 @@ class StudentRepositoryImpl(
     }
 
     fun getAllPrices(): Flow<List<YearPriceEntity>> = yearPriceDao.getAllPrices()
-    suspend fun updatePrice(year: String, newPrice: Int) =
-        yearPriceDao.insertOrUpdatePrice(YearPriceEntity(year, newPrice))
+    suspend fun updatePrice(year: String,subject:String ,newPrice: Int) =
+        yearPriceDao.insertOrUpdatePrice(YearPriceEntity(year,subject, newPrice))
 
     suspend fun getPriceForYear(year: String): Int =
         yearPriceDao.getPriceForYear(year) ?: 0
@@ -63,6 +63,9 @@ class StudentRepositoryImpl(
         return dao.getStudentsByYear(year).map { list ->
             list.map { it.toDomain() } // لو عندك دالة تحويل من Entity لـ Model
         }
+    }
+    suspend fun getPrice(year: String, subject: String): Int? {
+        return yearPriceDao.getPriceForYearAndSubject(year, subject)?.pricePerSession
     }
 
 

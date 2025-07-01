@@ -9,7 +9,7 @@ import com.example.attendancestudent.data.local.entity.YearPriceEntity
 
 @Database(
     entities = [StudentEntity::class, YearPriceEntity::class],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 abstract class AttendanceDatabase : RoomDatabase() {

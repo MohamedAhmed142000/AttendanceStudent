@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,12 +33,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.attendancestudent.R
 import com.example.attendancestudent.domain.model.Student
 import com.example.attendancestudent.presentation.student.viewmodel.StudentViewModel
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentScreen(viewModel: StudentViewModel) {
     val students by viewModel.students.collectAsState()
@@ -54,10 +54,16 @@ fun StudentScreen(viewModel: StudentViewModel) {
     }
     var confirmResetStudent by remember { mutableStateOf<Student?>(null) }
     val academicYears = listOf(
-        "الصف الأول الابتدائي", "الصف الثاني الابتدائي", "الصف الثالث الابتدائي",
-        "الصف الرابع الابتدائي", "الصف الخامس الابتدائي", "الصف السادس الابتدائي",
-        "الصف الأول الإعدادي", "الصف الثاني الإعدادي", "الصف الثالث الإعدادي",
-        "الصف الأول الثانوي", "الصف الثاني الثانوي", "الصف الثالث الثانوي"
+        stringResource(R.string.First_grade),
+        stringResource(R.string.Second_grade), stringResource(R.string.Third_grade),
+        stringResource(R.string.Fourth_grade),
+        stringResource(R.string.Fifth_grade), stringResource(R.string.Sixth_grade),
+        stringResource(R.string.First_year_of_middle_school),
+        stringResource(R.string.Second_year_of_middle_school),
+        stringResource(R.string.Thrid_year_of_middle_school),
+        stringResource(R.string.First_year_of_high_school),
+        stringResource(R.string.Second_year_of_high_school),
+        stringResource(R.string.Thrid_year_of_high_school)
     )
 
     val subjects = listOf(
@@ -103,6 +109,7 @@ fun StudentScreen(viewModel: StudentViewModel) {
                 .padding(padding)
                 .fillMaxSize()
         ) {
+            //todo implement search
             OutlinedTextField(
                 value = query,
                 onValueChange = {
@@ -115,9 +122,8 @@ fun StudentScreen(viewModel: StudentViewModel) {
                     .padding(8.dp)
             )
             Spacer(modifier = Modifier.height(4.dp))
-
+            //todo implement filter for year and subject
             Row(modifier = Modifier.padding(horizontal = 8.dp)) {
-
                 // فلتر السنة
                 Box(modifier = Modifier.weight(1f)) {
                     OutlinedTextField(
@@ -160,7 +166,11 @@ fun StudentScreen(viewModel: StudentViewModel) {
                                     selectedYear = year
                                     yearExpanded = false
                                     when {
-                                        selectedSubject.isNotBlank() -> viewModel.loadStudentsByYearAndSubject(selectedYear, selectedSubject)
+                                        selectedSubject.isNotBlank() -> viewModel.loadStudentsByYearAndSubject(
+                                            selectedYear,
+                                            selectedSubject
+                                        )
+
                                         else -> viewModel.getStudentsByYear(selectedYear)
                                     }
                                 }
@@ -168,9 +178,7 @@ fun StudentScreen(viewModel: StudentViewModel) {
                         }
                     }
                 }
-
                 Spacer(modifier = Modifier.width(4.dp))
-
                 // فلتر المادة
                 Box(modifier = Modifier.weight(1f)) {
                     OutlinedTextField(
@@ -186,11 +194,17 @@ fun StudentScreen(viewModel: StudentViewModel) {
                                         // إعادة تحميل الكل
                                         viewModel.getAllStudents()
                                     }) {
-                                        Icon(Icons.Default.Close, contentDescription = "إزالة الفلتر")
+                                        Icon(
+                                            Icons.Default.Close,
+                                            contentDescription = "إزالة الفلتر"
+                                        )
                                     }
                                 } else {
                                     IconButton(onClick = { subjectExpanded = true }) {
-                                        Icon(Icons.Default.ArrowDropDown, contentDescription = "اختر المادة")
+                                        Icon(
+                                            Icons.Default.ArrowDropDown,
+                                            contentDescription = "اختر المادة"
+                                        )
                                     }
                                 }
                             }
@@ -207,7 +221,11 @@ fun StudentScreen(viewModel: StudentViewModel) {
                                     selectedSubject = subject
                                     subjectExpanded = false
                                     when {
-                                        selectedYear.isNotBlank() -> viewModel.loadStudentsByYearAndSubject(selectedYear, selectedSubject)
+                                        selectedYear.isNotBlank() -> viewModel.loadStudentsByYearAndSubject(
+                                            selectedYear,
+                                            selectedSubject
+                                        )
+
                                         else -> viewModel.loadStudentsBySubject(selectedSubject)
                                     }
                                 }
@@ -217,12 +235,12 @@ fun StudentScreen(viewModel: StudentViewModel) {
                 }
             }
 
-
+//todo implement students list
             LazyColumn {
                 items(displayedStudents) { student ->
                     StudentItem(
                         student = student,
-                        cost = (yearPrices[student.academicYear] ?: 0) * student.attendedSessions,
+                        cost = viewModel.calculateCost(student),
                         onMarkAttendance = { viewModel.incrementStudentSessions(student.id) },
                         onEditStudent = { editingStudent = it },
                         onDeleteConfirmed = { viewModel.deleteStudent(it) },
@@ -233,16 +251,23 @@ fun StudentScreen(viewModel: StudentViewModel) {
                     )
                 }
             }
-
+//todo implement add student
             if (showDialog) {
                 AddStudentDialog(
                     onDismiss = { showDialog = false },
                     existingPrices = viewModel.yearPrices.collectAsState().value,
                     onAdd = { name, year, subject, price ->
                         // لو السنة مش موجودة وسعر اتبعت، سجّله
-                        if (!viewModel.yearPrices.value.containsKey(year) && price != null) {
-                            viewModel.updateYearPrice(year, price)
+                        if (!yearPrices.containsKey(
+                                Pair(
+                                    selectedYear,
+                                    selectedSubject
+                                )
+                            ) && price != null
+                        ) {
+                            viewModel.updateYearPrice(year, subject, price.toInt())
                         }
+
                         // أضف الطالب
                         viewModel.addStudent(
                             Student(
@@ -255,7 +280,7 @@ fun StudentScreen(viewModel: StudentViewModel) {
                     })
             }
 
-
+//todo implement edit student
             if (editingStudent != null) {
                 EditStudentDialog(
                     student = editingStudent!!,
@@ -263,13 +288,13 @@ fun StudentScreen(viewModel: StudentViewModel) {
                     onDismiss = { editingStudent = null },
                     onUpdate = { updatedStudent, year, subject, newPrice ->
                         if (newPrice != null) {
-                            viewModel.updateYearPrice(year, newPrice)
+                            viewModel.updateYearPrice(year, subject, newPrice)
                         }
                         viewModel.addStudent(updatedStudent) // أو اعمل updateStudent لو عندك ميثود ليها
                         editingStudent = null
                     })
             }
-
+//todo implement reset sessions
             if (confirmResetStudent != null) {
                 androidx.compose.material3.AlertDialog(
                     onDismissRequest = { confirmResetStudent = null },
@@ -296,7 +321,6 @@ fun StudentScreen(viewModel: StudentViewModel) {
                     }
                 )
             }
-
         }
     }
 }
