@@ -77,12 +77,6 @@ class StudentViewModel(
     }
 
 
-    fun resetSessions(studentId: Int) {
-        viewModelScope.launch {
-            useCases.resetSessions(studentId)
-        }
-    }
-
     fun incrementStudentSessions(studentId: Int) {
         viewModelScope.launch {
             val result = useCases.incrementSession(studentId)

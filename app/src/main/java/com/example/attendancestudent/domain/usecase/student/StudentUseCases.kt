@@ -17,7 +17,6 @@ data class StudentUseCases(
     val getAllPrices: GetAllPricesUseCase,
     val updatePrice: UpdateYearPriceUseCase,
     val searchStudents: SearchStudentsByNameUseCase,
-    val resetSessions: ResetSessionsUseCase,
     val getStudentsBySubject: GetStudentsBySubject,
     val getStudentsByYearAndSubject: GetStudentsByYearAndSubject,
     val getStudentsByYear: GetStudentsByYear,
