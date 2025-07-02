@@ -1,4 +1,4 @@
-package com.example.attendancestudent.domain.usecase.student
+package com.example.attendancestudent.domain.usecase.student.insert
 
 import com.example.attendancestudent.domain.model.Student
 import com.example.attendancestudent.domain.repository.StudentRepository

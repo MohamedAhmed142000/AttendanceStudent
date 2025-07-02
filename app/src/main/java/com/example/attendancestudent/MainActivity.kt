@@ -7,14 +7,14 @@ import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.example.attendancestudent.data.local.AttendanceDatabase
 import com.example.attendancestudent.data.repository.StudentRepositoryImpl
-import com.example.attendancestudent.domain.usecase.student.DeleteStudentUseCase
-import com.example.attendancestudent.domain.usecase.student.IncrementSessionUseCase
-import com.example.attendancestudent.domain.usecase.student.InsertStudentUseCase
-import com.example.attendancestudent.domain.usecase.student.SearchStudentsByNameUseCase
+import com.example.attendancestudent.domain.usecase.student.delete.DeleteStudentUseCase
+import com.example.attendancestudent.domain.usecase.student.increment.IncrementSessionUseCase
+import com.example.attendancestudent.domain.usecase.student.insert.InsertStudentUseCase
+import com.example.attendancestudent.domain.usecase.student.search.SearchStudentsByNameUseCase
 import com.example.attendancestudent.domain.usecase.student.StudentUseCases
-import com.example.attendancestudent.domain.usecase.student.UpdatePaidSessionsUseCase
-import com.example.attendancestudent.domain.usecase.student.UpdateStudentUseCase
-import com.example.attendancestudent.domain.usecase.student.UpdateYearPriceUseCase
+import com.example.attendancestudent.domain.usecase.student.update.UpdatePaidSessionsUseCase
+import com.example.attendancestudent.domain.usecase.student.update.UpdateStudentUseCase
+import com.example.attendancestudent.domain.usecase.student.update.UpdateYearPriceUseCase
 import com.example.attendancestudent.domain.usecase.student.get.GetAllPricesUseCase
 import com.example.attendancestudent.domain.usecase.student.get.GetAllStudentsUseCase
 import com.example.attendancestudent.domain.usecase.student.get.GetStudentByIdUseCase
@@ -28,8 +28,7 @@ import com.jakewharton.threetenabp.AndroidThreeTen
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        AndroidThreeTen.init(this) // مهم جدًا!
-        // Setup database manually (no Hilt)
+        AndroidThreeTen.init(this)
         val db = Room.databaseBuilder(
             applicationContext,
             AttendanceDatabase::class.java,
@@ -51,7 +50,7 @@ class MainActivity : ComponentActivity() {
             searchStudents = SearchStudentsByNameUseCase(repo),
 
             getStudentsBySubject = GetStudentsBySubject(repo),
-            getStudentsByYearAndSubject = GetStudentsByYearAndSubject(repo),// ✅ هنا
+            getStudentsByYearAndSubject = GetStudentsByYearAndSubject(repo),
             getStudentsByYear = GetStudentsByYear(repo),
             updatePaidSessions = UpdatePaidSessionsUseCase(repo)
 

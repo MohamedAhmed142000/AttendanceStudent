@@ -1,4 +1,4 @@
-package com.example.attendancestudent.domain.usecase.student
+package com.example.attendancestudent.domain.usecase.student.increment
 
 import com.example.attendancestudent.domain.repository.StudentRepository
 import org.threeten.bp.LocalDate
