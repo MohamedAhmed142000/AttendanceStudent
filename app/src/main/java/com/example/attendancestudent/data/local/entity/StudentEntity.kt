@@ -11,6 +11,9 @@ data class StudentEntity(
     val academicYear: String,
     val attendedSessions: Int = 0,
     val lastAttendanceDate: String? = null,
-    val subject: String // ✅ مضاف جديد
+    val subject: String ,// ✅ مضاف جديد
+    val paidSessions: Int = 0 // 👈 جديد
+
+
 
 )

@@ -41,7 +41,7 @@ import com.example.attendancestudent.presentation.student.viewmodel.StudentViewM
 
 
 @Composable
-fun StudentScreen(viewModel: StudentViewModel) {
+fun StudentScreen(viewModel: StudentViewModel, onPayClicked: (Student) -> Unit) {
     val students by viewModel.students.collectAsState()
     var showDialog by remember { mutableStateOf(false) }
     val yearPrices by viewModel.yearPrices.collectAsState()
@@ -55,9 +55,11 @@ fun StudentScreen(viewModel: StudentViewModel) {
     var confirmResetStudent by remember { mutableStateOf<Student?>(null) }
     val academicYears = listOf(
         stringResource(R.string.First_grade),
-        stringResource(R.string.Second_grade), stringResource(R.string.Third_grade),
+        stringResource(R.string.Second_grade),
+        stringResource(R.string.Third_grade),
         stringResource(R.string.Fourth_grade),
-        stringResource(R.string.Fifth_grade), stringResource(R.string.Sixth_grade),
+        stringResource(R.string.Fifth_grade),
+        stringResource(R.string.Sixth_grade),
         stringResource(R.string.First_year_of_middle_school),
         stringResource(R.string.Second_year_of_middle_school),
         stringResource(R.string.Thrid_year_of_middle_school),
@@ -140,8 +142,7 @@ fun StudentScreen(viewModel: StudentViewModel) {
                                         viewModel.getAllStudents()
                                     }) {
                                         Icon(
-                                            Icons.Default.Close,
-                                            contentDescription = "إزالة الفلتر"
+                                            Icons.Default.Close, contentDescription = "إزالة الفلتر"
                                         )
                                     }
                                 } else {
@@ -157,24 +158,19 @@ fun StudentScreen(viewModel: StudentViewModel) {
                         modifier = Modifier.fillMaxWidth()
                     )
                     DropdownMenu(
-                        expanded = yearExpanded,
-                        onDismissRequest = { yearExpanded = false }) {
+                        expanded = yearExpanded, onDismissRequest = { yearExpanded = false }) {
                         academicYears.forEach { year ->
-                            DropdownMenuItem(
-                                text = { Text(year) },
-                                onClick = {
-                                    selectedYear = year
-                                    yearExpanded = false
-                                    when {
-                                        selectedSubject.isNotBlank() -> viewModel.loadStudentsByYearAndSubject(
-                                            selectedYear,
-                                            selectedSubject
-                                        )
+                            DropdownMenuItem(text = { Text(year) }, onClick = {
+                                selectedYear = year
+                                yearExpanded = false
+                                when {
+                                    selectedSubject.isNotBlank() -> viewModel.loadStudentsByYearAndSubject(
+                                        selectedYear, selectedSubject
+                                    )
 
-                                        else -> viewModel.getStudentsByYear(selectedYear)
-                                    }
+                                    else -> viewModel.getStudentsByYear(selectedYear)
                                 }
-                            )
+                            })
                         }
                     }
                 }
@@ -195,8 +191,7 @@ fun StudentScreen(viewModel: StudentViewModel) {
                                         viewModel.getAllStudents()
                                     }) {
                                         Icon(
-                                            Icons.Default.Close,
-                                            contentDescription = "إزالة الفلتر"
+                                            Icons.Default.Close, contentDescription = "إزالة الفلتر"
                                         )
                                     }
                                 } else {
@@ -215,21 +210,17 @@ fun StudentScreen(viewModel: StudentViewModel) {
                         expanded = subjectExpanded,
                         onDismissRequest = { subjectExpanded = false }) {
                         subjects.forEach { subject ->
-                            DropdownMenuItem(
-                                text = { Text(subject) },
-                                onClick = {
-                                    selectedSubject = subject
-                                    subjectExpanded = false
-                                    when {
-                                        selectedYear.isNotBlank() -> viewModel.loadStudentsByYearAndSubject(
-                                            selectedYear,
-                                            selectedSubject
-                                        )
+                            DropdownMenuItem(text = { Text(subject) }, onClick = {
+                                selectedSubject = subject
+                                subjectExpanded = false
+                                when {
+                                    selectedYear.isNotBlank() -> viewModel.loadStudentsByYearAndSubject(
+                                        selectedYear, selectedSubject
+                                    )
 
-                                        else -> viewModel.loadStudentsBySubject(selectedSubject)
-                                    }
+                                    else -> viewModel.loadStudentsBySubject(selectedSubject)
                                 }
-                            )
+                            })
                         }
                     }
                 }
@@ -244,10 +235,7 @@ fun StudentScreen(viewModel: StudentViewModel) {
                         onMarkAttendance = { viewModel.incrementStudentSessions(student.id) },
                         onEditStudent = { editingStudent = it },
                         onDeleteConfirmed = { viewModel.deleteStudent(it) },
-                        onClearSessions = {
-                            confirmResetStudent = student
-                        }
-
+                        onPayClicked = onPayClicked
                     )
                 }
             }
@@ -260,8 +248,7 @@ fun StudentScreen(viewModel: StudentViewModel) {
                         // لو السنة مش موجودة وسعر اتبعت، سجّله
                         if (!yearPrices.containsKey(
                                 Pair(
-                                    selectedYear,
-                                    selectedSubject
+                                    selectedYear, selectedSubject
                                 )
                             ) && price != null
                         ) {
@@ -271,9 +258,7 @@ fun StudentScreen(viewModel: StudentViewModel) {
                         // أضف الطالب
                         viewModel.addStudent(
                             Student(
-                                fullName = name,
-                                academicYear = year,
-                                subject = subject
+                                fullName = name, academicYear = year, subject = subject
                             )
                         )
                         showDialog = false
@@ -294,33 +279,7 @@ fun StudentScreen(viewModel: StudentViewModel) {
                         editingStudent = null
                     })
             }
-//todo implement reset sessions
-            if (confirmResetStudent != null) {
-                androidx.compose.material3.AlertDialog(
-                    onDismissRequest = { confirmResetStudent = null },
-                    title = { Text("تأكيد الدفع") },
-                    text = {
-                        Text("هل أنت متأكد أنك تريد تصفير عدد الحصص للطالب ${confirmResetStudent?.fullName}؟")
-                    },
-                    confirmButton = {
-                        androidx.compose.material3.TextButton(
-                            onClick = {
-                                viewModel.resetSessions(confirmResetStudent!!.id)
-                                confirmResetStudent = null
-                            }
-                        ) {
-                            Text("نعم")
-                        }
-                    },
-                    dismissButton = {
-                        androidx.compose.material3.TextButton(
-                            onClick = { confirmResetStudent = null }
-                        ) {
-                            Text("إلغاء")
-                        }
-                    }
-                )
-            }
+
         }
     }
 }

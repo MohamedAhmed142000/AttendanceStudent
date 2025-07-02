@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class StudentViewModel(
     private val useCases: StudentUseCases
@@ -31,14 +32,15 @@ class StudentViewModel(
     init {
         viewModelScope.launch {
             useCases.getAllPrices().collect { list ->
-                _yearPrices.value = list.associate { Pair(it.year, it.subject) to it.pricePerSession }
+                _yearPrices.value =
+                    list.associate { Pair(it.year, it.subject) to it.pricePerSession }
             }
         }
         getAllStudents()
     }
 
 
-     fun getAllStudents() {
+    fun getAllStudents() {
         viewModelScope.launch {
             useCases.getAllStudents()
                 .collect { list ->
@@ -54,9 +56,9 @@ class StudentViewModel(
     }
 
 
-    fun updateYearPrice(year: String,subject:String, price: Int) {
+    fun updateYearPrice(year: String, subject: String, price: Int) {
         viewModelScope.launch {
-            useCases.updatePrice(year,subject, price)
+            useCases.updatePrice(year, subject, price)
         }
     }
 
@@ -73,7 +75,6 @@ class StudentViewModel(
         val price = yearPrices.value[key] ?: 0
         return student.attendedSessions * price
     }
-
 
 
     fun resetSessions(studentId: Int) {
@@ -108,6 +109,7 @@ class StudentViewModel(
             }
         }
     }
+
     fun getStudentsByYear(year: String) {
         viewModelScope.launch {
             useCases.getStudentsByYear(year).collect { students ->
@@ -116,6 +118,39 @@ class StudentViewModel(
         }
     }
 
+    fun getStudentById(id: Int): Student? {
+        var student: Student? = null
+        runBlocking {
+            student = useCases.getStudentById(id)
+
+            student?.let {
+                val price = _yearPrices.value[Pair(it.academicYear, it.subject)] ?: 0
+                student = it.copy(pricePerSession = price.toDouble())
+            }
+        }
+
+        return student
+    }
+
+    fun updatePaidSessions(studentId: Int, newPaidSessions: Int) {
+        viewModelScope.launch {
+            val student = useCases.getStudentById(studentId)
+            if (student != null && student.paidSessions < student.attendedSessions) {
+                val price = yearPrices.value[Pair(student.academicYear, student.subject)] ?: 0
+                if (student.paidSessions >= student.attendedSessions) {
+                    return@launch // وقف التنفيذ، مفيش دفع
+                } else {
+                    val newPaidSessions = student.paidSessions + 1
+
+                    val updatedStudent = student.copy(
+                        paidSessions = newPaidSessions,
+                        pricePerSession = price.toDouble()
+                    )
+                    useCases.updateStudent(updatedStudent)
+                }
+            }
+        }
+    }
 
     fun deleteStudent(student: Student) {
         viewModelScope.launch {

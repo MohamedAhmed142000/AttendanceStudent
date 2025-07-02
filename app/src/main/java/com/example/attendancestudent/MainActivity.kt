@@ -3,6 +3,7 @@ package com.example.attendancestudent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.example.attendancestudent.data.local.AttendanceDatabase
 import com.example.attendancestudent.data.local.MIGRATION_1_2
@@ -19,11 +20,13 @@ import com.example.attendancestudent.domain.usecase.student.InsertStudentUseCase
 import com.example.attendancestudent.domain.usecase.student.ResetSessionsUseCase
 import com.example.attendancestudent.domain.usecase.student.SearchStudentsByNameUseCase
 import com.example.attendancestudent.domain.usecase.student.StudentUseCases
+import com.example.attendancestudent.domain.usecase.student.UpdatePaidSessionsUseCase
 import com.example.attendancestudent.domain.usecase.student.UpdateStudentUseCase
 import com.example.attendancestudent.domain.usecase.student.UpdateYearPriceUseCase
 import com.example.attendancestudent.domain.usecase.student.get.GetStudentsBySubject
 import com.example.attendancestudent.domain.usecase.student.get.GetStudentsByYear
 import com.example.attendancestudent.domain.usecase.student.get.GetStudentsByYearAndSubject
+import com.example.attendancestudent.presentation.student.screen.AppNavHost
 import com.example.attendancestudent.presentation.student.screen.StudentScreen
 import com.example.attendancestudent.presentation.student.viewmodel.StudentViewModel
 import com.jakewharton.threetenabp.AndroidThreeTen
@@ -37,7 +40,8 @@ class MainActivity : ComponentActivity() {
             applicationContext,
             AttendanceDatabase::class.java,
             "attendance_db"
-        ).addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5) // ✅ هنا بتستخدم الـ migration
+        ).fallbackToDestructiveMigration() // تحذف القاعدة القديمة وتبني واحدة جديدة
+//.addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5) // ✅ هنا بتستخدم الـ migration
         .build()
 
         val repo = StudentRepositoryImpl(db.studentDao(),db.yearPriceDao())
@@ -54,14 +58,16 @@ class MainActivity : ComponentActivity() {
             resetSessions = ResetSessionsUseCase(repo),
             getStudentsBySubject= GetStudentsBySubject(repo),
              getStudentsByYearAndSubject= GetStudentsByYearAndSubject(repo),// ✅ هنا
-           getStudentsByYear= GetStudentsByYear(repo)
+           getStudentsByYear= GetStudentsByYear(repo),
+            updatePaidSessions= UpdatePaidSessionsUseCase(repo)
 
             )
 
         val viewModel = StudentViewModel(useCases)
 
         setContent {
-            StudentScreen(viewModel = viewModel)
+            val navController = rememberNavController()
+            AppNavHost(navController = navController, viewModel = viewModel)
         }
     }
 }

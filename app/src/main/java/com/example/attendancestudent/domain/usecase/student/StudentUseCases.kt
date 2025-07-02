@@ -20,5 +20,9 @@ data class StudentUseCases(
     val resetSessions: ResetSessionsUseCase,
     val getStudentsBySubject: GetStudentsBySubject,
     val getStudentsByYearAndSubject: GetStudentsByYearAndSubject,
-    val getStudentsByYear: GetStudentsByYear
+    val getStudentsByYear: GetStudentsByYear,
+    val updatePaidSessions: UpdatePaidSessionsUseCase
+
+
+
 )

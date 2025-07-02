@@ -1,12 +1,31 @@
 package com.example.attendancestudent.presentation.student.screen
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.attendancestudent.domain.model.Student
@@ -18,7 +37,7 @@ fun StudentItem(
     cost: Int,
     onEditStudent: (Student) -> Unit,
     onDeleteConfirmed: (Student) -> Unit,
-    onClearSessions: () -> Unit // ✅ الزر الجديد
+    onPayClicked: (Student) -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
     val cardColor = when {
@@ -26,7 +45,7 @@ fun StudentItem(
         student.attendedSessions >= 5 -> Color(0xFFE3F2FD)  // أزرق فاتح
         else -> Color(0xFFE8F5E9)                          // أخضر فاتح
     }
-
+//todo implement delete student
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
@@ -48,35 +67,37 @@ fun StudentItem(
             })
     }
     Card(
-        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = cardColor)
 
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 16.dp, end = 30.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp, end = 30.dp),
             verticalAlignment = Alignment.Top
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
+                Text("👤 الاسم: ${student.fullName}", style = MaterialTheme.typography.titleMedium)
                 Text(
-                    text = "👤 الاسم: ${student.fullName}",
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = "📘 السنة الدراسية: ${student.academicYear}",
+                    "📘 السنة الدراسية: ${student.academicYear}",
                     style = MaterialTheme.typography.bodyMedium
                 )
+                Text("📚 المادة: ${student.subject}", style = MaterialTheme.typography.bodySmall)
                 Text(
-                    text = "📅 عدد الحصص: ${student.attendedSessions}",
+                    "📅 عدد الحصص: ${student.attendedSessions}",
                     style = MaterialTheme.typography.bodySmall
                 )
-                Text("💰 التكلفة: $cost جنيه", style = MaterialTheme.typography.bodySmall)
+                Text(
+                    "💵 المدفوعة: ${student.paidSessions}",
+                    style = MaterialTheme.typography.bodySmall
+                )
+                // Text("💰 التكلفة: $cost جنيه", style = MaterialTheme.typography.bodySmall)
 
-                Text(
-                    text = "📚 المادة: ${student.subject}",
-                    style = MaterialTheme.typography.bodySmall
-                )
 
                 Spacer(modifier = Modifier.height(8.dp))
                 Row {
@@ -85,8 +106,8 @@ fun StudentItem(
                     }
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Button(onClick = onClearSessions) {
-                        Text("تم الدفع") // ✅ زر التصفير
+                    Button(onClick = { onPayClicked(student) }) {
+                        Text(" الدفع") // ✅ زر التصفير
                     }
                 }
             }

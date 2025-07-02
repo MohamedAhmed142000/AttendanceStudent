@@ -15,7 +15,7 @@ interface StudentRepository {
     fun getStudentsBySubject(subject: String): Flow<List<Student>>
     fun getStudentsByYearAndSubject(year: String, subject: String): Flow<List<Student>>
     fun getStudentsByYear(year: String): Flow<List<Student>>
-
+suspend fun updatePaidSessions(studentId: Int, paidSessions: Int)
 
 
 }
