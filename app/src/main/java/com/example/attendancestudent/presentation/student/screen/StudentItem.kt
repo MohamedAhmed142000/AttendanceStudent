@@ -1,11 +1,13 @@
 package com.example.attendancestudent.presentation.student.screen
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -37,7 +39,8 @@ fun StudentItem(
     cost: Int,
     onEditStudent: (Student) -> Unit,
     onDeleteConfirmed: (Student) -> Unit,
-    onPayClicked: (Student) -> Unit
+    onPayClicked: (Student) -> Unit,
+    onMarkAbsent: () -> Unit
 ) {
     var showDialog by remember { mutableStateOf(false) }
     val cardColor = when {
@@ -97,31 +100,60 @@ fun StudentItem(
                     style = MaterialTheme.typography.bodySmall
                 )
                 // Text("💰 التكلفة: $cost جنيه", style = MaterialTheme.typography.bodySmall)
+                //   Text("🚫 الغياب: ${student.absentCount}")
 
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                //todo implement mark attendance , mark absent and pay
                 Row {
                     Button(onClick = onMarkAttendance) {
                         Text("تسجيل حضور ✅")
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Spacer(modifier = Modifier.width(4.dp))
 
                     Button(onClick = { onPayClicked(student) }) {
-                        Text(" الدفع") // ✅ زر التصفير
+                        Text(" الدفع")
                     }
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Column {
+
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        Button(
+                            onClick = onMarkAbsent,
+                            enabled = student.attendedSessions == 0 && !student.isAbsent
+                        ) {
+                            Text("غياب")
+                        }
+                        if (student.isAbsent) {
+                            Text(
+                                "🚫 متغيب",
+                                color = Color.Red,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        }
+                    }
+
                 }
+
+
             }
-            Column {
-                IconButton(onClick = { showDialog = true }) { // ✅ زر الإكس
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "حذف الطالب",
-                        tint = Color.Red
-                    )
-                }
-                IconButton(onClick = { onEditStudent(student) }) {
-                    Icon(Icons.Default.Edit, contentDescription = "تعديل", tint = Color.Blue)
-                }
+
+//todo implement buttom edit and delete
+            Column(verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.End) {
+
+                    IconButton(onClick = { showDialog = true }) { // ✅ زر الإكس
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "حذف الطالب",
+                            tint = Color.Red
+                        )
+                    }
+                    IconButton(onClick = { onEditStudent(student) }) {
+                        Icon(Icons.Default.Edit, contentDescription = "تعديل", tint = Color.Blue)
+                    }
 
 
             }

@@ -145,6 +145,19 @@ class StudentViewModel(
             }
         }
     }
+    fun markAttendance(studentId: Int) {
+        viewModelScope.launch {
+            val result = useCases.markAttendance(studentId)
+            _attendanceResult.value = result
+        }
+    }
+
+    fun markAbsent(studentId: Int) {
+        viewModelScope.launch {
+            val result = useCases.markAbsent(studentId)
+            _attendanceResult.value = result
+        }
+    }
 
     fun deleteStudent(student: Student) {
         viewModelScope.launch {

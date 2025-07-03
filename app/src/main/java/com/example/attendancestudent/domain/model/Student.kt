@@ -8,7 +8,10 @@ data class Student(
     val lastAttendanceDate: String? = null,
     val subject: String, // ✅ أضف هذا السطر
     val paidSessions: Int = 0, // 👈 جديد
-    val pricePerSession: Double = 0.0// 👈 ضفناها هنا
+    val pricePerSession: Double = 0.0
+    , val isAbsent: Boolean = false,
+    val absentCount: Int = 0
+
 
 ) {
     val remainingSessions: Int

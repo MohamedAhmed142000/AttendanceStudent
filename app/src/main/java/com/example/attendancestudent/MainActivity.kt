@@ -7,21 +7,22 @@ import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.example.attendancestudent.data.local.AttendanceDatabase
 import com.example.attendancestudent.data.repository.StudentRepositoryImpl
-import com.example.attendancestudent.domain.usecase.student.delete.DeleteStudentUseCase
-import com.example.attendancestudent.domain.usecase.student.increment.IncrementSessionUseCase
-import com.example.attendancestudent.domain.usecase.student.insert.InsertStudentUseCase
-import com.example.attendancestudent.domain.usecase.student.search.SearchStudentsByNameUseCase
 import com.example.attendancestudent.domain.usecase.student.StudentUseCases
-import com.example.attendancestudent.domain.usecase.student.update.UpdatePaidSessionsUseCase
-import com.example.attendancestudent.domain.usecase.student.update.UpdateStudentUseCase
-import com.example.attendancestudent.domain.usecase.student.update.UpdateYearPriceUseCase
+import com.example.attendancestudent.domain.usecase.student.delete.DeleteStudentUseCase
 import com.example.attendancestudent.domain.usecase.student.get.GetAllPricesUseCase
 import com.example.attendancestudent.domain.usecase.student.get.GetAllStudentsUseCase
 import com.example.attendancestudent.domain.usecase.student.get.GetStudentByIdUseCase
 import com.example.attendancestudent.domain.usecase.student.get.GetStudentsBySubject
 import com.example.attendancestudent.domain.usecase.student.get.GetStudentsByYear
 import com.example.attendancestudent.domain.usecase.student.get.GetStudentsByYearAndSubject
-import com.example.attendancestudent.presentation.student.screen.AppNavHost
+import com.example.attendancestudent.domain.usecase.student.increment.IncrementSessionUseCase
+import com.example.attendancestudent.domain.usecase.student.insert.InsertStudentUseCase
+import com.example.attendancestudent.domain.usecase.student.mark.MarkAbsent
+import com.example.attendancestudent.domain.usecase.student.search.SearchStudentsByNameUseCase
+import com.example.attendancestudent.domain.usecase.student.update.UpdatePaidSessionsUseCase
+import com.example.attendancestudent.domain.usecase.student.update.UpdateStudentUseCase
+import com.example.attendancestudent.domain.usecase.student.update.UpdateYearPriceUseCase
+import com.example.attendancestudent.presentation.student.screen.payment.AppNavHost
 import com.example.attendancestudent.presentation.student.viewmodel.StudentViewModel
 import com.jakewharton.threetenabp.AndroidThreeTen
 
@@ -30,11 +31,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         AndroidThreeTen.init(this)
         val db = Room.databaseBuilder(
-            applicationContext,
-            AttendanceDatabase::class.java,
-            "attendance_db"
-        ).fallbackToDestructiveMigration() // تحذف القاعدة القديمة وتبني واحدة جديدة
-//.addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5) // ✅ هنا بتستخدم الـ migration
+            applicationContext, AttendanceDatabase::class.java, "attendance_db"
+        ).fallbackToDestructiveMigration(false) // تحذف القاعدة القديمة وتبني واحدة جديدة
+            //.addMigrations(MIGRATION_1_2,MIGRATION_2_3,MIGRATION_3_4,MIGRATION_4_5) // ✅ هنا بتستخدم الـ migration
             .build()
 
         val repo = StudentRepositoryImpl(db.studentDao(), db.yearPriceDao())
@@ -48,11 +47,11 @@ class MainActivity : ComponentActivity() {
             getAllPrices = GetAllPricesUseCase(repo),
             updatePrice = UpdateYearPriceUseCase(repo),
             searchStudents = SearchStudentsByNameUseCase(repo),
-
             getStudentsBySubject = GetStudentsBySubject(repo),
             getStudentsByYearAndSubject = GetStudentsByYearAndSubject(repo),
             getStudentsByYear = GetStudentsByYear(repo),
-            updatePaidSessions = UpdatePaidSessionsUseCase(repo)
+            updatePaidSessions = UpdatePaidSessionsUseCase(repo),
+            markAbsent = MarkAbsent(repo)
 
         )
 

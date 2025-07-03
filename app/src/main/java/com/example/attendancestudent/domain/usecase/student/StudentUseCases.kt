@@ -9,6 +9,7 @@ import com.example.attendancestudent.domain.usecase.student.get.GetStudentsByYea
 import com.example.attendancestudent.domain.usecase.student.get.GetStudentsByYearAndSubject
 import com.example.attendancestudent.domain.usecase.student.increment.IncrementSessionUseCase
 import com.example.attendancestudent.domain.usecase.student.insert.InsertStudentUseCase
+import com.example.attendancestudent.domain.usecase.student.mark.MarkAbsent
 import com.example.attendancestudent.domain.usecase.student.search.SearchStudentsByNameUseCase
 import com.example.attendancestudent.domain.usecase.student.update.UpdatePaidSessionsUseCase
 import com.example.attendancestudent.domain.usecase.student.update.UpdateStudentUseCase
@@ -27,8 +28,9 @@ data class StudentUseCases(
     val getStudentsBySubject: GetStudentsBySubject,
     val getStudentsByYearAndSubject: GetStudentsByYearAndSubject,
     val getStudentsByYear: GetStudentsByYear,
-    val updatePaidSessions: UpdatePaidSessionsUseCase
+    val updatePaidSessions: UpdatePaidSessionsUseCase,
 
+    val markAbsent: MarkAbsent
 
 
 )

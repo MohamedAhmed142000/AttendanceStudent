@@ -12,10 +12,12 @@ class IncrementSessionUseCase(
         if (student.lastAttendanceDate == today) {
             return false // الحضور بالفعل مسجل النهاردة
         }
-
         val updated = student.copy(
             attendedSessions = student.attendedSessions + 1,
-            lastAttendanceDate = today
+            lastAttendanceDate = today,
+            isAbsent = false,
+            absentCount =
+                if (student.isAbsent && student.absentCount > 0) student.absentCount - 1 else student.absentCount
         )
         repository.updateStudent(updated)
         return true

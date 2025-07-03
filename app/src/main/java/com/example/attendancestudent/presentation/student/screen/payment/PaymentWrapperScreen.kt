@@ -1,4 +1,4 @@
-package com.example.attendancestudent.presentation.student.screen
+package com.example.attendancestudent.presentation.student.screen.payment
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

@@ -1,4 +1,4 @@
-package com.example.attendancestudent.presentation.student.screen
+package com.example.attendancestudent.presentation.student.screen.add_dialog
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer

@@ -58,4 +58,5 @@ interface StudentDao {
     //todo update paid sessions
     @Query("UPDATE students SET paidSessions = :paidSessions WHERE id = :studentId")
     suspend fun updatePaidSessions(studentId: Int, paidSessions: Int)
+    //todo updata
 }
